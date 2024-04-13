@@ -17,9 +17,9 @@ module StingrayDocsInternal # :nodoc:
           methods = public_interface(method_obj, class_name).map { |n| n + "\n\n" }.join.rstrip
 
           private_methods = private_interface(method_obj, class_name, private_methods_list)
-          private_methods_block = private_methods.empty? ? "" : "# private\n#{private_methods.join.strip}"
 
-          docstring(method_obj.type, methods, private_methods_block, class_name)
+          private_methods_block = private_methods.empty? ? nil : "# private\n#{private_methods.join.strip}"
+          docstring(method_obj.type, class_name, methods, private_methods_block )
         end.join("\n")
       end
 
@@ -149,8 +149,18 @@ module StingrayDocsInternal # :nodoc:
       # @param [ObjectYARD::CodeObjects::MethodObject] methods The documentation for the methods.
       # @param [String] private_methods_block The documentation for the private methods.
       # @return [String] The final documentation string.
-      def docstring(struct_type, methods, private_methods_block, class_name)
-        ["#{struct_type} #{class_name}", methods, private_methods_block].join("\n") + "end"
+      def docstring(struct_type, class_name, methods, private_methods_block)
+          content = [
+          struct_type.to_s + ' ' + class_name.to_s,
+          methods,
+          private_methods_block
+        ].compact.join("\n")
+
+
+      <<~DOC
+        #{content}
+        end
+      DOC
       end
     end
   end
